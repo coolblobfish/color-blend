@@ -19,6 +19,7 @@ When finding a color in a ColorRegion, the target position should have the same 
 
 \
 In the following image, the top half is shaded using simple RGB blending, and the bottom half uses the hybrid algorithm.
+
 <img width="1280" height="360" alt="rgb vs hybrid gradient" src="https://github.com/user-attachments/assets/8eff3b8d-c5b2-444e-b22e-4bc0d31c80af" />
 
 The middle range of the hybrid gradient is noticeably more vibrant than that of the RGB gradient.
