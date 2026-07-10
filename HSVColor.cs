@@ -23,7 +23,7 @@ namespace ColorBlend
             float maxVal = V * 255;
             if (S == 0)
             {
-                int colorAmount = (int)(maxVal + 0.5);
+                byte colorAmount = (byte)(maxVal + 0.5);
                 return new RGBColor(colorAmount, colorAmount, colorAmount);
             }
 
@@ -45,9 +45,9 @@ namespace ColorBlend
                 rgbNormalized = [1, 0, (360 - H) / 60];
 
             return new RGBColor(
-                (int)(rgbNormalized[0] * range + minVal + 0.5),
-                (int)(rgbNormalized[1] * range + minVal + 0.5),
-                (int)(rgbNormalized[2] * range + minVal + 0.5));
+                (byte)(rgbNormalized[0] * range + minVal + 0.5),
+                (byte)(rgbNormalized[1] * range + minVal + 0.5),
+                (byte)(rgbNormalized[2] * range + minVal + 0.5));
         }
 
         public HSVColor Blend(HSVColor other, float t)

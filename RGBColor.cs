@@ -2,17 +2,23 @@
 
 namespace ColorBlend
 {
-    public readonly struct RGBColor(int r, int g, int b)
+    public readonly struct RGBColor(byte r, byte g, byte b)
     {
+        // Coefficients for luminance: R = 0.2126, G = 0.7152, B = 0.0722
         static readonly float[] lightnessWeights = [0.2126f, 0.7152f, 0.0722f];
 
-        public readonly int R { get; } = r;
-        public readonly int G { get; } = g;
-        public readonly int B { get; } = b;
+        public readonly byte R { get; } = r;
+        public readonly byte G { get; } = g;
+        public readonly byte B { get; } = b;
 
         public static RGBColor FromColor(Color color)
         {
             return new RGBColor(color.R, color.G, color.B);
+        }
+
+        public int ToArgb()
+        {
+            return (255 << 24) | (R << 16) | (G << 8) | B;
         }
 
         public Color ToColor()
@@ -71,9 +77,9 @@ namespace ColorBlend
         public RGBColor Blend(RGBColor other, float t)
         {
             return new RGBColor(
-                R + (int)((other.R - R) * t + 0.5),
-                G + (int)((other.G - G) * t + 0.5),
-                B + (int)((other.B - B) * t + 0.5));
+                (byte)(R + ((other.R - R) * t + 0.5)),
+                (byte)(G + ((other.G - G) * t + 0.5)),
+                (byte)(B + ((other.B - B) * t + 0.5)));
         }
 
         public static float GetLuminance(float r, float g, float b)
@@ -129,9 +135,9 @@ namespace ColorBlend
             {
                 float scale = (float)Math.Sqrt(luminance / GetLuminance(rgbArray[0], rgbArray[1], rgbArray[2]));
                 return new RGBColor(
-                    (int)(R * scale + 0.5),
-                    (int)(G * scale + 0.5),
-                    (int)(B * scale + 0.5));
+                    (byte)(R * scale + 0.5),
+                    (byte)(G * scale + 0.5),
+                    (byte)(B * scale + 0.5));
             }
 
             int medIndex = 3 - maxIndex - minIndex;
@@ -151,9 +157,9 @@ namespace ColorBlend
             finalColors[minIndex] = 255 * minColorAmount;
 
             return new RGBColor(
-                    (int)(finalColors[0] + 0.5),
-                    (int)(finalColors[1] + 0.5),
-                    (int)(finalColors[2] + 0.5));
+                    (byte)(finalColors[0] + 0.5),
+                    (byte)(finalColors[1] + 0.5),
+                    (byte)(finalColors[2] + 0.5));
         }
 
         public RGBColor ChangeValue(RGBColor valueColor)

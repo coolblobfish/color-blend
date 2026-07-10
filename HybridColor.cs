@@ -25,7 +25,7 @@ namespace ColorBlend
             HSV = hsv;
         }
 
-        public HybridColor(int r, int g, int b)
+        public HybridColor(byte r, byte g, byte b)
         {
             RGB = new RGBColor(r, g, b);
             HSV = RGB.ToHSV();
@@ -37,7 +37,7 @@ namespace ColorBlend
             RGB = HSV.ToRGB();
         }
 
-        public HybridColor(int r, int g, int b, float h, float s, float v)
+        public HybridColor(byte r, byte g, byte b, float h, float s, float v)
         {
             RGB = new RGBColor(r, g, b);
             HSV = new HSVColor(h, s, v);
@@ -140,9 +140,9 @@ namespace ColorBlend
             }
 
             return new RGBColor(
-                (int)(resultRGB[0] + 0.5),
-                (int)(resultRGB[1] + 0.5),
-                (int)(resultRGB[2] + 0.5));
+                (byte)(resultRGB[0] + 0.5),
+                (byte)(resultRGB[1] + 0.5),
+                (byte)(resultRGB[2] + 0.5));
         }
 
         public override string ToString() => $"[{RGB}, {HSV}]";
