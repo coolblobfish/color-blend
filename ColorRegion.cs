@@ -7,6 +7,14 @@
         private float[] weights;
         private int dimensions;
 
+        public ColorRegion()
+        {
+            colors = [];
+            positions = new float[0, 0];
+            weights = [];
+            dimensions = 0;
+        }
+
         public ColorRegion(HybridColor[] colors, float[,] positions, float[]? weights)
         {
             int minLength = Math.Min(colors.Length, positions.GetLength(0));
@@ -132,8 +140,8 @@
 
         public RGBColor GetLinearRGB(float[] targetPos)
         {
-            if (colors.Length == 1)
-                return colors[0].RGB;
+            if (colors.Length <= 1)
+                return colors.Length == 1 ? colors[0].RGB : new RGBColor(0, 0, 0);
 
             if (targetPos.Length != dimensions)
                 targetPos = SecureDimensions(targetPos);

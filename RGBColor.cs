@@ -133,11 +133,11 @@ namespace ColorBlend
 
             if (targetLightness <= maxLightness)
             {
-                float scale = (float)Math.Sqrt(luminance / GetLuminance(rgbArray[0], rgbArray[1], rgbArray[2]));
+                float scale = 255 * (float)Math.Sqrt(luminance / GetLuminance(rgbArray[0], rgbArray[1], rgbArray[2]));
                 return new RGBColor(
-                    (byte)(R * scale + 0.5),
-                    (byte)(G * scale + 0.5),
-                    (byte)(B * scale + 0.5));
+                    (byte)(rgbArray[0] * scale + 0.5),
+                    (byte)(rgbArray[1] * scale + 0.5),
+                    (byte)(rgbArray[2] * scale + 0.5));
             }
 
             int medIndex = 3 - maxIndex - minIndex;

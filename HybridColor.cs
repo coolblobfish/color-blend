@@ -67,6 +67,9 @@ namespace ColorBlend
 
         public static RGBColor BlendMulti(HybridColor[] colors, float[,] positions, float[] target, float[]? colorWeights)
         {
+            if (colors.Length == 0)
+                return new RGBColor(0, 0, 0);
+
             float[] weights = new float[colors.Length];
 
             for (int i = 0; i < colors.Length; i++)
