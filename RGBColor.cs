@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 
 namespace ColorBlend
 {
@@ -92,7 +93,7 @@ namespace ColorBlend
             float luminance = GetLuminance(r, g, b);
             if (luminance <= 216 / 24389f)
                 return luminance * 24389 / 27f;
-            return 116 * (float)Math.Pow(luminance, 1 / 3d) - 16;
+            return 116 * (float)Math.Cbrt(luminance) - 16;
         }
 
         public float GetLightness()
@@ -123,8 +124,12 @@ namespace ColorBlend
             }
 
             if (maxVal == 0)
+            {
                 for (int i = 0; i < rgbArray.Length; i++)
                     rgbArray[i] = 1;
+                maxVal = 1;
+                minVal = 1;
+            }
 
             float maxLightness = GetLightness(rgbArray[0] / maxVal, rgbArray[1] / maxVal, rgbArray[2] / maxVal);
 
@@ -168,6 +173,6 @@ namespace ColorBlend
             return new HSVColor(thisColor.H, thisColor.S, valueColor.ToHSV().V).ToRGB();
         }
 
-        public override string ToString() => $"({R}, {G}, {B})";
+        public override string ToString() => $"RGB=({R}, {G}, {B})";
     }
 }

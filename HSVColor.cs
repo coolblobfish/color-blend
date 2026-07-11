@@ -102,6 +102,6 @@ namespace ColorBlend
             return new HSVColor(hue, saturation, satWeight1 + satWeight2);
         }
 
-        public override string ToString() => $"({H:F0}, {S:F3}, {V:F3})";
+        public override string ToString() => $"HSV=({H:F0}, {S:F3}, {V:F3})";
     }
 }
