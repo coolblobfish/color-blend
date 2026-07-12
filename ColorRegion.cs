@@ -30,7 +30,7 @@
             }
 
             this.colors = new HybridColor[minLength];
-            this.positions = new float[minLength, Dimensions];
+            this.positions = new float[minLength, positions.GetLength(1)];
             this.weights = new float[minLength];
 
             for (int i = 0; i < minLength; i++)
@@ -43,6 +43,10 @@
         }
 
         public ColorRegion(HybridColor[] colors, float[,] positions) : this(colors, positions, null) { }
+
+        public HybridColor[] GetColors() => (HybridColor[])colors.Clone();
+        public float[,] GetPositions() => (float[,])positions.Clone();
+        public float[] GetWeights() => (float[])weights.Clone();
 
         public void Add(HybridColor color, float[] position, float weight)
         {
