@@ -132,7 +132,7 @@
             return safePosition;
         }
 
-        public RGBColor GetRGB(float[] targetPos)
+        public RGBColor GetPointRGB(float[] targetPos)
         {
             if (targetPos.Length != Dimensions)
                 targetPos = SecureDimensions(targetPos);
@@ -157,6 +157,9 @@
             }
             return colors[0].Blend(colors[1], Math.Clamp(numerator / denominator, 0, 1));
         }
+
+        public RGBColor GetAutoRGB(float[] targetPos)
+            => colors.Length <= 2 ? GetLinearRGB(targetPos) : GetPointRGB(targetPos);
 
         public override string ToString()
         {
