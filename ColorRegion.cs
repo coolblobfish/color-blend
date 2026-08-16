@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace ColorBlend
+﻿namespace ColorBlend
 {
     public class ColorRegion
     {
