@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 
 namespace ColorBlend
 {
@@ -89,7 +90,7 @@ namespace ColorBlend
                         bool samePosition = true;
                         for (int coord = 0; coord < target.Length; coord++)
                         {
-                            if (target[coord] == positions[j, coord])
+                            if (target[coord] != positions[j, coord])
                             {
                                 samePosition = false;
                                 break;
