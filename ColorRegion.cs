@@ -146,7 +146,7 @@
         {
             if (targetPos.Length != Dimensions)
                 targetPos = SecureDimensions(targetPos);
-            return CustomColor.BlendMulti(colors, positions, targetPos, weights, Mode).ToRGB();
+            return CustomColor.BlendMulti(colors, positions, targetPos, weights, Mode);
         }
 
         public RGBColor GetLinearRGB(float[] targetPos)

@@ -17,10 +17,10 @@
                 _ => HybridColor.Blend,
             };
 
-        public static CustomColor BlendMulti(CustomColor[] colors, float[,] positions, float[] target, float[] colorWeights, BlendMode blendMode)
+        public static RGBColor BlendMulti(CustomColor[] colors, float[,] positions, float[] target, float[] colorWeights, BlendMode blendMode)
             => BlendMulti(colors, positions, target, colorWeights, GetBlendMethod(blendMode));
 
-        protected static CustomColor BlendMulti(CustomColor[] colors, float[,] positions, float[] target,
+        protected static RGBColor BlendMulti(CustomColor[] colors, float[,] positions, float[] target,
             float[] colorWeights, BlendMethod blendMethod)
         {
             if (colors.Length == 0)
