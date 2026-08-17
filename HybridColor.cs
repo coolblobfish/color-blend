@@ -5,6 +5,7 @@ namespace ColorBlend
     public class HybridColor
     {
         public delegate float Smooth(float t);
+
         public static readonly Smooth smoothCosine = t => 0.5f * (1 - (float)Math.Cos(Math.PI * t));
 
         public RGBColor RGB { get; }
