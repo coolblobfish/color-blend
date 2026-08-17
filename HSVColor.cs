@@ -1,24 +1,16 @@
-﻿using System.Drawing;
-
-namespace ColorBlend
+﻿namespace ColorBlend
 {
-    public readonly struct HSVColor(float h, float s, float v)
+    public class HSVColor(float h, float s, float v) : CustomColor
     {
-        public readonly float H { get; } = h;
-        public readonly float S { get; } = s;
-        public readonly float V { get; } = v;
+        public float H { get; } = h;
+        public float S { get; } = s;
+        public float V { get; } = v;
 
-        public static HSVColor FromColor(Color color)
-        {
-            return RGBColor.FromColor(color).ToHSV();
-        }
+        public override HSVColor ToHSV() => this;
 
-        public Color ToColor()
-        {
-            return ToRGB().ToColor();
-        }
+        public override HybridColor ToHybrid() => new(ToRGB(), this);
 
-        public RGBColor ToRGB()
+        public override RGBColor ToRGB()
         {
             float maxVal = V * 255;
             if (S == 0)
@@ -59,22 +51,25 @@ namespace ColorBlend
             return (hue1, hue2 + 360);
         }
 
-        public HSVColor Blend(HSVColor other, float t)
+        public static HSVColor Blend(CustomColor color1, CustomColor color2, float t)
         {
-            float satWeight1 = V * (1 - t);
-            float satWeight2 = other.V * t;
+            if (color1 is not HSVColor hsv1) hsv1 = color1.ToHSV();
+            if (color2 is not HSVColor hsv2) hsv2 = color2.ToHSV();
+
+            float satWeight1 = hsv1.V * (1 - t);
+            float satWeight2 = hsv2.V * t;
             float saturation;
             if (satWeight1 + satWeight2 == 0)
             {
-                saturation = S + (other.S - S) * t;
+                saturation = hsv1.S + (hsv2.S - hsv1.S) * t;
             }
             else
             {
-                saturation = (S * satWeight1 + other.S * satWeight2) / (satWeight1 + satWeight2);
+                saturation = (hsv1.S * satWeight1 + hsv2.S * satWeight2) / (satWeight1 + satWeight2);
             }
 
-            float hueWeight1 = S * satWeight1;
-            float hueWeight2 = other.S * satWeight2;
+            float hueWeight1 = hsv1.S * satWeight1;
+            float hueWeight2 = hsv2.S * satWeight2;
             float hue;
             if (hueWeight1 + hueWeight2 == 0)
             {
@@ -82,7 +77,7 @@ namespace ColorBlend
             }
             else
             {
-                (float hue1, float hue2) = FixWrapAround(H, other.H);
+                (float hue1, float hue2) = FixWrapAround(hsv1.H, hsv2.H);
                 hue = (hue1 * hueWeight1 + hue2 * hueWeight2) / (hueWeight1 + hueWeight2);
                 if (hue > 360)
                     hue -= 360;
@@ -91,15 +86,18 @@ namespace ColorBlend
             return new HSVColor(hue, saturation, satWeight1 + satWeight2);
         }
 
-        public HSVColor BlendRaw(HSVColor other, float t)
+        public static HSVColor BlendRaw(CustomColor color1, CustomColor color2, float t)
         {
-            (float hue1, float hue2) = FixWrapAround(H, other.H);
+            if (color1 is not HSVColor hsv1) hsv1 = color1.ToHSV();
+            if (color2 is not HSVColor hsv2) hsv2 = color2.ToHSV();
+
+            (float hue1, float hue2) = FixWrapAround(hsv1.H, hsv2.H);
 
             float hue = hue1 + (hue2 - hue1) * t;
             if (hue > 360)
                 hue -= 360;
 
-            return new HSVColor(hue, S + (other.S - S) * t, V + (other.V - V) * t);
+            return new HSVColor(hue, hsv1.S + (hsv2.S - hsv1.S) * t, hsv1.V + (hsv2.V - hsv1.V) * t);
         }
 
         public override string ToString() => $"HSV=({H:F0}, {S:F3}, {V:F3})";

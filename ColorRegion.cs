@@ -2,20 +2,30 @@
 {
     public class ColorRegion
     {
-        private HybridColor[] colors;
+        private CustomColor[] colors;
         private float[,] positions;
         private float[] weights;
         public int Dimensions { get => positions.GetLength(1); }
         public int Count { get => colors.Length; }
+        public BlendMode Mode { get; set; }
 
-        public ColorRegion()
+        public ColorRegion() : this(BlendMode.Hybrid) { }
+
+        public ColorRegion(BlendMode mode)
         {
             colors = [];
             positions = new float[0, 0];
             weights = [];
+            Mode = mode;
         }
 
-        public ColorRegion(HybridColor[] colors, float[,] positions, float[]? weights)
+        public ColorRegion(CustomColor[] colors, float[,] positions)
+            : this(colors, positions, null, BlendMode.Hybrid) { }
+
+        public ColorRegion(CustomColor[] colors, float[,] positions, float[]? weights)
+            : this(colors, positions, weights, BlendMode.Hybrid) { }
+
+        public ColorRegion(CustomColor[] colors, float[,] positions, float[]? weights, BlendMode mode)
         {
             int minLength = Math.Min(colors.Length, positions.GetLength(0));
             if (weights != null)
@@ -29,7 +39,7 @@
                 return;
             }
 
-            this.colors = new HybridColor[minLength];
+            this.colors = new CustomColor[minLength];
             this.positions = new float[minLength, positions.GetLength(1)];
             this.weights = new float[minLength];
 
@@ -40,15 +50,15 @@
                 for (int j = 0; j < Dimensions; j++)
                     this.positions[i, j] = positions[i, j];
             }
+
+            Mode = mode;
         }
 
-        public ColorRegion(HybridColor[] colors, float[,] positions) : this(colors, positions, null) { }
-
-        public HybridColor[] GetColors() => (HybridColor[])colors.Clone();
+        public CustomColor[] GetColors() => (CustomColor[])colors.Clone();
         public float[,] GetPositions() => (float[,])positions.Clone();
         public float[] GetWeights() => (float[])weights.Clone();
 
-        public void Add(HybridColor color, float[] position, float weight)
+        public void Add(CustomColor color, float[] position, float weight)
         {
             if (colors.Length == 0)
             {
@@ -61,7 +71,7 @@
             }
 
             int newLength = colors.Length + 1;
-            HybridColor[] newColors = new HybridColor[newLength];
+            CustomColor[] newColors = new CustomColor[newLength];
             float[,] newPositions = new float[newLength, Dimensions];
             float[] newWeights = new float[newLength];
 
@@ -83,7 +93,7 @@
             positions = newPositions;
         }
 
-        public void Add(HybridColor color, float[] position)
+        public void Add(CustomColor color, float[] position)
         {
             Add(color, position, 1);
         }
@@ -94,7 +104,7 @@
                 return;
 
             int newLength = colors.Length - 1;
-            HybridColor[] newColors = new HybridColor[newLength];
+            CustomColor[] newColors = new CustomColor[newLength];
             float[,] newPositions = new float[newLength, Dimensions];
             float[] newWeights = new float[newLength];
 
@@ -112,7 +122,7 @@
             positions = newPositions;
         }
 
-        public void Remove(HybridColor color)
+        public void Remove(CustomColor color)
         {
             for (int i = 0; i < colors.Length; i++)
             {
@@ -136,13 +146,13 @@
         {
             if (targetPos.Length != Dimensions)
                 targetPos = SecureDimensions(targetPos);
-            return HybridColor.BlendMulti(colors, positions, targetPos, weights);
+            return CustomColor.BlendMulti(colors, positions, targetPos, weights, Mode).ToRGB();
         }
 
         public RGBColor GetLinearRGB(float[] targetPos)
         {
             if (colors.Length <= 1)
-                return colors.Length == 1 ? colors[0].RGB : new RGBColor(0, 0, 0);
+                return colors.Length == 1 ? colors[0].ToRGB() : new RGBColor(0, 0, 0);
 
             if (targetPos.Length != Dimensions)
                 targetPos = SecureDimensions(targetPos);
@@ -155,7 +165,9 @@
                 numerator += directionCoord * (targetPos[i] - positions[0, i]);
                 denominator += directionCoord * directionCoord;
             }
-            return colors[0].Blend(colors[1], Math.Clamp(numerator / denominator, 0, 1));
+
+            var blendMethod = CustomColor.GetBlendMethod(Mode);
+            return blendMethod(colors[0], colors[1], Math.Clamp(numerator / denominator, 0, 1)).ToRGB();
         }
 
         public RGBColor GetAutoRGB(float[] targetPos)
@@ -185,7 +197,7 @@
             string result = "ColorRegion:\n";
             for (int i = 0; i < colors.Length; i++)
             {
-                result += $"  [{i}]: {colors[i].RGB}, pos=(";
+                result += $"  [{i}]: {colors[i].ToRGB()}, pos=(";
                 for (int j = 0; j < Dimensions; j++)
                 {
                     result += Math.Round(positions[i, j], 3);

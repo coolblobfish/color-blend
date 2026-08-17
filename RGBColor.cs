@@ -1,32 +1,19 @@
-﻿using System.Drawing;
-
-namespace ColorBlend
+﻿namespace ColorBlend
 {
-    public readonly struct RGBColor(byte r, byte g, byte b)
+    public class RGBColor(byte r, byte g, byte b) : CustomColor
     {
         // Coefficients for luminance: R = 0.2126, G = 0.7152, B = 0.0722
         static readonly float[] lightnessWeights = [0.2126f, 0.7152f, 0.0722f];
 
-        public readonly byte R { get; } = r;
-        public readonly byte G { get; } = g;
-        public readonly byte B { get; } = b;
+        public byte R { get; } = r;
+        public byte G { get; } = g;
+        public byte B { get; } = b;
 
-        public static RGBColor FromColor(Color color)
-        {
-            return new RGBColor(color.R, color.G, color.B);
-        }
+        public override RGBColor ToRGB() => this;
 
-        public int ToArgb()
-        {
-            return (255 << 24) | (R << 16) | (G << 8) | B;
-        }
+        public override HybridColor ToHybrid() => new(this, ToHSV());
 
-        public Color ToColor()
-        {
-            return Color.FromArgb(R, G, B);
-        }
-
-        public HSVColor ToHSV()
+        public override HSVColor ToHSV()
         {
             int[] rgbArray = [R, G, B];
             int maxVal = rgbArray[0];
@@ -74,12 +61,15 @@ namespace ColorBlend
             return new HSVColor(hue, (float)range / maxVal, (float)maxVal / 255);
         }
 
-        public RGBColor Blend(RGBColor other, float t)
+        public static RGBColor Blend(CustomColor color1, CustomColor color2, float t)
         {
+            if (color1 is not RGBColor rgb1) rgb1 = color1.ToRGB();
+            if (color2 is not RGBColor rgb2) rgb2 = color2.ToRGB();
+
             return new RGBColor(
-                (byte)(R + ((other.R - R) * t + 0.5)),
-                (byte)(G + ((other.G - G) * t + 0.5)),
-                (byte)(B + ((other.B - B) * t + 0.5)));
+                (byte)(rgb1.R + (rgb2.R - rgb1.R) * t + 0.5),
+                (byte)(rgb1.G + (rgb2.G - rgb1.G) * t + 0.5),
+                (byte)(rgb1.B + (rgb2.B - rgb1.B) * t + 0.5));
         }
 
         public static float GetLuminance(float r, float g, float b)

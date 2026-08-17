@@ -1,8 +1,6 @@
-﻿using System.Drawing;
-
-namespace ColorBlend
+﻿namespace ColorBlend
 {
-    public class HybridColor
+    public class HybridColor : CustomColor
     {
         public delegate float Smooth(float t);
 
@@ -47,32 +45,31 @@ namespace ColorBlend
             HSV = new HSVColor(h, s, v);
         }
 
-        public static HybridColor FromColor(Color color)
-        {
-            RGBColor rgb = RGBColor.FromColor(color);
-            return new HybridColor(rgb, rgb.ToHSV());
-        }
+        public override RGBColor ToRGB() => RGB;
 
-        public Color ToColor()
-        {
-            return RGB.ToColor();
-        }
+        public override HSVColor ToHSV() => HSV;
 
-        public RGBColor Blend(HybridColor other, float t, Smooth? smooth)
+        public override HybridColor ToHybrid() => this;
+
+        public static RGBColor Blend(CustomColor color1, CustomColor color2, float t, Smooth? smooth)
         {
-            float rgbWeight = Math.Abs(HSV.H - other.HSV.H) / 180;
+            if (color1 is not HybridColor hybrid1) hybrid1 = color1.ToHybrid();
+            if (color2 is not HybridColor hybrid2) hybrid2 = color2.ToHybrid();
+
+            float rgbWeight = Math.Abs(hybrid1.HSV.H - hybrid2.HSV.H) / 180;
             if (rgbWeight > 1)
                 rgbWeight = 2 - rgbWeight;
             if (smooth != null)
                 rgbWeight = smooth(rgbWeight);
-            RGBColor rgbBlend = RGB.Blend(other.RGB, t);
-            RGBColor hsvBlend = HSV.Blend(other.HSV, t).ToRGB();
-            return hsvBlend.Blend(rgbBlend, rgbWeight);
+            RGBColor rgbBlend = RGBColor.Blend(hybrid1.RGB, hybrid2.RGB, t);
+            RGBColor hsvBlend = HSVColor.Blend(hybrid1.HSV, hybrid2.HSV, t).ToRGB();
+            return RGBColor.Blend(hsvBlend, rgbBlend, rgbWeight);
         }
 
-        public RGBColor Blend(HybridColor other, float t) => Blend(other, t, null);
+        public static RGBColor Blend(CustomColor color1, CustomColor color2, float t)
+            => Blend(color1, color2, t, null);
 
-        public static RGBColor BlendMulti(HybridColor[] colors, float[,] positions, float[] target, float[]? colorWeights)
+        public static RGBColor BlendMulti(CustomColor[] colors, float[,] positions, float[] target, float[]? colorWeights)
         {
             if (colors.Length == 0)
                 return new RGBColor(0, 0, 0);
@@ -105,7 +102,7 @@ namespace ColorBlend
                         if (samePosition)
                             indices.Add(j);
                     }
-                    HybridColor[] newColors = new HybridColor[indices.Count];
+                    CustomColor[] newColors = new CustomColor[indices.Count];
                     weights = new float[indices.Count];
                     for (int j = 0; j < indices.Count; j++)
                     {
@@ -120,7 +117,7 @@ namespace ColorBlend
             }
 
             if (colors.Length == 1)
-                return colors[0].RGB;
+                return colors[0].ToRGB();
 
             RGBColor[] blends = new RGBColor[colors.Length * (colors.Length - 1) / 2];
             float[] finalWeights = new float[blends.Length];
@@ -131,7 +128,7 @@ namespace ColorBlend
             {
                 for (int j = i + 1; j < colors.Length; j++)
                 {
-                    blends[index] = colors[i].Blend(colors[j], weights[j] / (weights[i] + weights[j]));
+                    blends[index] = Blend(colors[i], colors[j], weights[j] / (weights[i] + weights[j]));
                     finalWeights[index] = weights[i] * weights[j];
                     weightSum += finalWeights[index];
                     index++;
