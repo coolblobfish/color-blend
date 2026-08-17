@@ -7,25 +7,25 @@
         private float[] weights;
         public int Dimensions { get => positions.GetLength(1); }
         public int Count { get => colors.Length; }
-        public BlendMode Mode { get; set; }
+        public BlendMethod Method { get; set; }
 
-        public ColorRegion() : this(BlendMode.Hybrid) { }
+        public ColorRegion() : this(HybridColor.Blend) { }
 
-        public ColorRegion(BlendMode mode)
+        public ColorRegion(BlendMethod method)
         {
             colors = [];
             positions = new float[0, 0];
             weights = [];
-            Mode = mode;
+            Method = method;
         }
 
         public ColorRegion(CustomColor[] colors, float[,] positions)
-            : this(colors, positions, null, BlendMode.Hybrid) { }
+            : this(colors, positions, null, HybridColor.Blend) { }
 
         public ColorRegion(CustomColor[] colors, float[,] positions, float[]? weights)
-            : this(colors, positions, weights, BlendMode.Hybrid) { }
+            : this(colors, positions, weights, HybridColor.Blend) { }
 
-        public ColorRegion(CustomColor[] colors, float[,] positions, float[]? weights, BlendMode mode)
+        public ColorRegion(CustomColor[] colors, float[,] positions, float[]? weights, BlendMethod method)
         {
             int minLength = Math.Min(colors.Length, positions.GetLength(0));
             if (weights != null)
@@ -51,7 +51,7 @@
                     this.positions[i, j] = positions[i, j];
             }
 
-            Mode = mode;
+            Method = method;
         }
 
         public CustomColor[] GetColors() => (CustomColor[])colors.Clone();
@@ -146,7 +146,7 @@
         {
             if (targetPos.Length != Dimensions)
                 targetPos = SecureDimensions(targetPos);
-            return CustomColor.BlendMulti(colors, positions, targetPos, weights, Mode);
+            return CustomColor.BlendMulti(colors, positions, targetPos, weights, Method);
         }
 
         public RGBColor GetLinearRGB(float[] targetPos)
@@ -166,8 +166,7 @@
                 denominator += directionCoord * directionCoord;
             }
 
-            var blendMethod = CustomColor.GetBlendMethod(Mode);
-            return blendMethod(colors[0], colors[1], Math.Clamp(numerator / denominator, 0, 1)).ToRGB();
+            return Method(colors[0], colors[1], Math.Clamp(numerator / denominator, 0, 1)).ToRGB();
         }
 
         public RGBColor GetAutoRGB(float[] targetPos)

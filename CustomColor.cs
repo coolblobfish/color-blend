@@ -1,26 +1,14 @@
 ﻿namespace ColorBlend
 {
+    public delegate CustomColor BlendMethod(CustomColor color1, CustomColor color2, float t);
+
     public abstract class CustomColor
     {
         public abstract RGBColor ToRGB();
         public abstract HSVColor ToHSV();
         public abstract HybridColor ToHybrid();
 
-        public delegate CustomColor BlendMethod(CustomColor color1, CustomColor color2, float t);
-
-        public static BlendMethod GetBlendMethod(BlendMode blendMode)
-            => blendMode switch
-            {
-                BlendMode.RGB => RGBColor.Blend,
-                BlendMode.HSV => HSVColor.Blend,
-                BlendMode.Hybrid => HybridColor.Blend,
-                _ => HybridColor.Blend,
-            };
-
-        public static RGBColor BlendMulti(CustomColor[] colors, float[,] positions, float[] target, float[] colorWeights, BlendMode blendMode)
-            => BlendMulti(colors, positions, target, colorWeights, GetBlendMethod(blendMode));
-
-        protected static RGBColor BlendMulti(CustomColor[] colors, float[,] positions, float[] target,
+        public static RGBColor BlendMulti(CustomColor[] colors, float[,] positions, float[] target,
             float[] colorWeights, BlendMethod blendMethod)
         {
             if (colors.Length == 0)
