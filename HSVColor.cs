@@ -61,8 +61,20 @@ namespace ColorBlend
 
         public HSVColor Blend(HSVColor other, float t)
         {
-            float hueWeight1 = S * (1 - t);
-            float hueWeight2 = other.S * t;
+            float satWeight1 = V * (1 - t);
+            float satWeight2 = other.V * t;
+            float saturation;
+            if (satWeight1 + satWeight2 == 0)
+            {
+                saturation = S + (other.S - S) * t;
+            }
+            else
+            {
+                saturation = (S * satWeight1 + other.S * satWeight2) / (satWeight1 + satWeight2);
+            }
+
+            float hueWeight1 = S * satWeight1;
+            float hueWeight2 = other.S * satWeight2;
             float hue;
             if (hueWeight1 + hueWeight2 == 0)
             {
@@ -74,18 +86,6 @@ namespace ColorBlend
                 hue = (hue1 * hueWeight1 + hue2 * hueWeight2) / (hueWeight1 + hueWeight2);
                 if (hue > 360)
                     hue -= 360;
-            }
-
-            float satWeight1 = V * (1 - t);
-            float satWeight2 = other.V * t;
-            float saturation;
-            if (satWeight1 + satWeight2 == 0)
-            {
-                saturation = S + (other.S - S) * t;
-            }
-            else
-            {
-                saturation = (S * satWeight1 + other.S * satWeight2) / (satWeight1 + satWeight2);
             }
 
             return new HSVColor(hue, saturation, satWeight1 + satWeight2);
