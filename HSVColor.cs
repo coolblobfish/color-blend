@@ -50,29 +50,17 @@ namespace ColorBlend
                 (byte)(rgbNormalized[2] * range + minVal + 0.5));
         }
 
+        private static (float, float) FixWrapAround(float hue1, float hue2)
+        {
+            if (Math.Abs(hue1 - hue2) <= 180)
+                return (hue1, hue2);
+            if (hue1 < hue2)
+                return (hue1 + 360, hue2);
+            return (hue1, hue2 + 360);
+        }
+
         public HSVColor Blend(HSVColor other, float t)
         {
-            float hue1;
-            float hue2;
-            if (Math.Abs(other.H - H) <= 180)
-            {
-                hue1 = H;
-                hue2 = other.H;
-            }
-            else
-            {
-                if (H > other.H)
-                {
-                    hue1 = H;
-                    hue2 = other.H + 360;
-                }
-                else
-                {
-                    hue1 = H + 360;
-                    hue2 = other.H;
-                }
-            }
-
             float hueWeight1 = S * (1 - t);
             float hueWeight2 = other.S * t;
             float hue;
@@ -82,6 +70,7 @@ namespace ColorBlend
             }
             else
             {
+                (float hue1, float hue2) = FixWrapAround(H, other.H);
                 hue = (hue1 * hueWeight1 + hue2 * hueWeight2) / (hueWeight1 + hueWeight2);
                 if (hue > 360)
                     hue -= 360;
@@ -100,6 +89,17 @@ namespace ColorBlend
             }
 
             return new HSVColor(hue, saturation, satWeight1 + satWeight2);
+        }
+
+        public HSVColor BlendRaw(HSVColor other, float t)
+        {
+            (float hue1, float hue2) = FixWrapAround(H, other.H);
+
+            float hue = hue1 + (hue2 - hue1) * t;
+            if (hue > 360)
+                hue -= 360;
+
+            return new HSVColor(hue, S + (other.S - S) * t, V + (other.V - V) * t);
         }
 
         public override string ToString() => $"HSV=({H:F0}, {S:F3}, {V:F3})";

@@ -54,16 +54,25 @@ namespace ColorBlend
             return RGB.ToColor();
         }
 
-        public RGBColor Blend(HybridColor other, float t)
+        public delegate float Smooth(float t);
+
+        private static float SmoothCosine(float t)
+        {
+            return 0.5f * (1 - (float)Math.Cos(Math.PI * t));
+        }
+
+        public RGBColor Blend(HybridColor other, float t, Smooth smooth)
         {
             float rgbWeight = Math.Abs(HSV.H - other.HSV.H) / 180;
             if (rgbWeight > 1)
                 rgbWeight = 2 - rgbWeight;
-            rgbWeight = 0.5f * (1 - (float)Math.Cos(Math.PI * rgbWeight));
+            rgbWeight = smooth(rgbWeight);
             RGBColor rgbBlend = RGB.Blend(other.RGB, t);
             RGBColor hsvBlend = HSV.Blend(other.HSV, t).ToRGB();
             return hsvBlend.Blend(rgbBlend, rgbWeight);
         }
+
+        public RGBColor Blend(HybridColor other, float t) => Blend(other, t, SmoothCosine);
 
         public static RGBColor BlendMulti(HybridColor[] colors, float[,] positions, float[] target, float[]? colorWeights)
         {
