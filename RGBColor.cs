@@ -77,9 +77,9 @@ namespace ColorBlend
         public RGBColor Blend(RGBColor other, float t)
         {
             return new RGBColor(
-                (byte)(R + ((other.R - R) * t + 0.5)),
-                (byte)(G + ((other.G - G) * t + 0.5)),
-                (byte)(B + ((other.B - B) * t + 0.5)));
+                (byte)(R + Math.Round((other.R - R) * t)),
+                (byte)(G + Math.Round((other.G - G) * t)),
+                (byte)(B + Math.Round((other.B - B) * t)));
         }
 
         public static float GetLuminance(float r, float g, float b)
@@ -139,9 +139,9 @@ namespace ColorBlend
             {
                 float scale = 255 * (float)Math.Sqrt(luminance / GetLuminance(rgbArray[0], rgbArray[1], rgbArray[2]));
                 return new RGBColor(
-                    (byte)(rgbArray[0] * scale + 0.5),
-                    (byte)(rgbArray[1] * scale + 0.5),
-                    (byte)(rgbArray[2] * scale + 0.5));
+                    (byte)Math.Round(rgbArray[0] * scale),
+                    (byte)Math.Round(rgbArray[1] * scale),
+                    (byte)Math.Round(rgbArray[2] * scale));
             }
 
             int medIndex = 3 - maxIndex - minIndex;
@@ -161,9 +161,9 @@ namespace ColorBlend
             finalColors[minIndex] = 255 * minColorAmount;
 
             return new RGBColor(
-                    (byte)(finalColors[0] + 0.5),
-                    (byte)(finalColors[1] + 0.5),
-                    (byte)(finalColors[2] + 0.5));
+                    (byte)Math.Round(finalColors[0]),
+                    (byte)Math.Round(finalColors[1]),
+                    (byte)Math.Round(finalColors[2]));
         }
 
         public RGBColor ChangeValue(RGBColor valueColor)

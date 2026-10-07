@@ -23,7 +23,7 @@ namespace ColorBlend
             float maxVal = V * 255;
             if (S == 0)
             {
-                byte colorAmount = (byte)(maxVal + 0.5);
+                byte colorAmount = (byte)Math.Round(maxVal);
                 return new RGBColor(colorAmount, colorAmount, colorAmount);
             }
 
@@ -45,9 +45,9 @@ namespace ColorBlend
                 rgbNormalized = [1, 0, (360 - H) / 60];
 
             return new RGBColor(
-                (byte)(rgbNormalized[0] * range + minVal + 0.5),
-                (byte)(rgbNormalized[1] * range + minVal + 0.5),
-                (byte)(rgbNormalized[2] * range + minVal + 0.5));
+                (byte)Math.Round(rgbNormalized[0] * range + minVal),
+                (byte)Math.Round(rgbNormalized[1] * range + minVal),
+                (byte)Math.Round(rgbNormalized[2] * range + minVal));
         }
 
         private static (float, float) FixWrapAround(float hue1, float hue2)

@@ -150,9 +150,9 @@ namespace ColorBlend
             }
 
             return new RGBColor(
-                (byte)(resultRGB[0] + 0.5),
-                (byte)(resultRGB[1] + 0.5),
-                (byte)(resultRGB[2] + 0.5));
+                (byte)Math.Round(resultRGB[0]),
+                (byte)Math.Round(resultRGB[1]),
+                (byte)Math.Round(resultRGB[2]));
         }
 
         public override string ToString() => $"[{RGB}, {HSV}]";
